@@ -1,0 +1,9 @@
+langchain-nvidia-ai-endpoints==0.1.0
+jupyter==1.0.0
+notebook==6.5.4
+openai==1.10.0
+python-dotenv==1.0.0
+
+# Node.js dependencies (for package.json)
+# openai
+# typescript (optional)
