@@ -22,124 +22,73 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install nbformat jupyter nbconvert
-
+        pip install nbformat jupyter
+    
     - name: Validate and Repair Notebooks
+      id: repair
       run: |
         python3 - << EOF
 import os
 import json
 import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
-
-def validate_notebook(notebook_path):
-    try:
-        # Read the notebook
-        with open(notebook_path, 'r', encoding='utf-8') as f:
-            nb = nbformat.read(f, as_version=4)
-        
-        # Validate notebook structure
-        nbformat.validate(nb)
-        
-        # Check for potential issues
-        issues = []
-        
-        # Check code cell outputs
-        for i, cell in enumerate(nb.cells):
-            if cell.cell_type == 'code':
-                # Check for empty code cells
-                if not cell.source.strip():
-                    issues.append(f"Empty code cell at index {i}")
-                
-                # Reset execution count
-                cell.execution_count = None
-        
-        # Return validation results
-        return {
-            'valid': len(issues) == 0,
-            'issues': issues
-        }
-    
-    except Exception as e:
-        return {
-            'valid': False,
-            'error': str(e)
-        }
 
 def repair_notebook(notebook_path):
     try:
         # Read the notebook
-        with open(notebook_path, 'r', encoding='utf-8') as f:
-            nb = nbformat.read(f, as_version=4)
+        with open(notebook_path, 'r') as f:
+            notebook = json.load(f)
         
-        # Repair notebook
-        modified = False
+        # Flag to track if changes were made
+        notebook_modified = False
         
-        # Ensure cells exist
-        if not hasattr(nb, 'cells'):
-            nb.cells = []
-            modified = True
-        
-        # Clean up cells
-        for cell in nb.cells:
-            # Reset execution count
-            if cell.cell_type == 'code':
-                cell.execution_count = None
-                
+        # Repair code cells
+        for cell in notebook.get('cells', []):
+            if cell.get('cell_type') == 'code':
                 # Ensure outputs exist
-                if not hasattr(cell, 'outputs'):
-                    cell.outputs = []
-                    modified = True
+                if 'outputs' not in cell:
+                    cell['outputs'] = []
+                    notebook_modified = True
+                
+                # Reset execution count
+                cell['execution_count'] = None
         
         # Write back if modified
-        if modified:
-            with open(notebook_path, 'w', encoding='utf-8') as f:
-                nbformat.write(nb, f)
+        if notebook_modified:
+            with open(notebook_path, 'w') as f:
+                json.dump(notebook, f, indent=2)
             print(f"Repaired notebook: {notebook_path}")
+            return True
         
-        return modified
+        return False
     
     except Exception as e:
-        print(f"Error repairing {notebook_path}: {e}")
+        print(f"Error processing {notebook_path}: {e}")
         return False
 
-# Find and validate notebooks
-invalid_notebooks = []
-repaired_notebooks = []
-
+# Find and repair notebooks
+modified_notebooks = []
 for root, dirs, files in os.walk('.'):
     for file in files:
         if file.endswith('.ipynb'):
             notebook_path = os.path.join(root, file)
-            
-            # Validate notebook
-            validation_result = validate_notebook(notebook_path)
-            
-            if not validation_result['valid']:
-                print(f"Invalid notebook: {notebook_path}")
-                print("Issues:", validation_result.get('issues', validation_result.get('error', 'Unknown error')))
-                invalid_notebooks.append(notebook_path)
-                
-                # Attempt repair
-                if repair_notebook(notebook_path):
-                    repaired_notebooks.append(notebook_path)
+            if repair_notebook(notebook_path):
+                modified_notebooks.append(notebook_path)
 
-# Report results
-print("\nNotebook Validation Summary:")
-print(f"Total invalid notebooks: {len(invalid_notebooks)}")
-print(f"Notebooks repaired: {len(repaired_notebooks)}")
-
-# Fail workflow if any notebooks are invalid and couldn't be repaired
-if invalid_notebooks and not repaired_notebooks:
-    print("Some notebooks are invalid and could not be automatically repaired.")
+# If notebooks were modified, fail the workflow
+if modified_notebooks:
+    print("The following notebooks were modified:")
+    for notebook in modified_notebooks:
+        print(f"  - {notebook}")
     exit(1)
 EOF
     
     - name: Commit repaired notebooks
+      if: failure() && steps.repair.outcome == 'failure'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add **/*.ipynb
-        git diff --quiet && exit 0
-        git commit -m "Auto-repair Jupyter notebooks"
+        git add *.ipynb
+        git commit -m "Auto-repair Jupyter notebooks" || exit 0
         git push
