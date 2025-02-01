@@ -185,6 +185,29 @@ Jupyter notebooks are stored as JSON files with a specific structure:
 - Verify metadata is correctly defined
 - Use tools like `nbconvert` to validate notebooks
 
+## Automated Notebook Validation
+
+### GitHub Action Workflow
+We've implemented an automated Jupyter notebook validation workflow that:
+- Checks all `.ipynb` files on push and pull requests
+- Automatically repairs notebook JSON structure
+- Ensures compatibility with GitHub rendering
+- Fixes common notebook formatting issues
+
+#### Workflow Features
+- Validates notebook JSON structure
+- Adds missing `outputs` property to code cells
+- Resets `execution_count`
+- Commits and pushes repaired notebooks
+
+### How It Works
+1. Scans all Jupyter notebooks in the repository
+2. Checks for required notebook properties
+3. Automatically repairs formatting issues
+4. Prevents merging if critical issues are found
+
+**Note**: This workflow helps maintain notebook quality and ensures consistent rendering across different platforms.
+
 ## Performance Evaluation
 
 ### DeepSeek Performance Notebook
@@ -337,9 +360,8 @@ plt.show()
 # Performance Summary
 # This notebook provides a comprehensive evaluation of the 
 # DeepSeek-R1 model's performance across reasoning and coding tasks.
-```
 
-### Notebook Execution Notes
+## Notebook Execution Notes
 - Requires NVIDIA API Key
 - Depends on environment variables
 - Uses OpenAI client for model interaction
