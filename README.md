@@ -208,6 +208,36 @@ We've implemented an automated Jupyter notebook validation workflow that:
 
 **Note**: This workflow helps maintain notebook quality and ensures consistent rendering across different platforms.
 
+## API Response Validation
+
+### Automated Testing Strategy
+We've implemented comprehensive API response validation to ensure:
+- Consistent and reliable AI model performance
+- Robust error handling
+- Quality of generated responses
+
+#### Test Coverage
+- Reasoning query validation
+- Coding generation tests
+- Multilingual response checks
+- Token limit adherence
+
+### Validation Workflow
+- Runs daily via GitHub Actions
+- Triggered on pull requests
+- Checks API responses against predefined criteria
+
+#### Key Validation Checks
+- Response structure integrity
+- Content relevance
+- Language understanding
+- Token limit compliance
+
+### Monitoring and Alerts
+- Automatic Slack notifications on test failures
+- Detailed error reporting
+- Continuous integration monitoring
+
 ## Performance Evaluation
 
 ### DeepSeek Performance Notebook
