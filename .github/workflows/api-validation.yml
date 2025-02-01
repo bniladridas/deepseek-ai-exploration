@@ -1,4 +1,4 @@
-name: DeepSeek AI Model Validation
+name: Advanced AI Model Performance Validation
 
 on:
   schedule:
@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 jobs:
-  model-benchmarking:
+  advanced-model-benchmarking:
     runs-on: ubuntu-latest
     
     steps:
@@ -22,64 +22,37 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install openai python-dotenv pytest
+        pip install -r requirements.txt
     
-    - name: Run API Response Tests
+    - name: Run Advanced Model Benchmarking
       env:
         NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       run: |
         cd tests
-        python -m pytest api_response_validator.py
+        python advanced_benchmarking.py
     
-    - name: Run Performance and Rate Limiting Tests
-      env:
-        NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: |
-        cd tests
-        python -m pytest performance_rate_validator.py
+    - name: Upload Performance Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: model-performance-reports
+        path: |
+          reports/comprehensive_benchmark_report.json
+          reports/model_performance.db
+          reports/*.html
+        retention-days: 30
     
-    - name: Run Multi-Model Benchmarking
-      env:
-        NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      run: |
-        cd tests
-        python model_benchmarking.py
-    
-    - name: Generate Comprehensive Report
-      if: always()
-      run: |
-        mkdir -p reports
-        python -c "
-import json
-from datetime import datetime
-
-report = {
-    'timestamp': datetime.now().isoformat(),
-    'status': '${{ job.status }}',
-    'workflow_name': 'DeepSeek AI Model Validation'
-}
-
-with open('reports/comprehensive_report.json', 'w') as f:
-    json.dump(report, f, indent=2)
-        "
-    
-    - name: Notify on Failure
-      if: failure()
+    - name: Notify Performance Insights
       uses: 8398a7/action-slack@v3
+      if: always()
       with:
         status: ${{ job.status }}
-        text: Model Validation Tests Failed! Critical Performance Issues Detected 
+        text: >
+          AI Model Performance Benchmark Completed! 
+          📊 Reports Generated: 
+          - Comprehensive JSON Report
+          - SQLite Performance Database
+          - Interactive Visualizations
         webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-    
-    - name: Upload Benchmark Reports
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: model-benchmark-reports
-        path: |
-          benchmark_report.json
-          reports/comprehensive_report.json
-        retention-days: 30
