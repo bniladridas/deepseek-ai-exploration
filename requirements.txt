@@ -7,11 +7,12 @@ pytest==7.4.3
 plotly==5.18.0
 numpy==1.24.3
 anthropic==0.7.0
-google-generativeai==0.3.1
-sqlite3
+google-generativeai
+streamlit
+pandas==2.0.1
+scikit-learn==1.2.2
 
 # Performance Evaluation Dependencies
-pandas==2.0.1
 matplotlib==3.7.1
 
 # Node.js dependencies (for package.json)
