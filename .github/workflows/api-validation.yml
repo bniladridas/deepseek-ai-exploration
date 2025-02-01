@@ -31,10 +31,43 @@ jobs:
         cd tests
         python -m pytest api_response_validator.py
     
+    - name: Run Performance and Rate Limiting Tests
+      env:
+        NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+      run: |
+        cd tests
+        python -m pytest performance_rate_validator.py
+    
+    - name: Generate Performance Report
+      if: always()
+      run: |
+        mkdir -p reports
+        python -c "
+import json
+from datetime import datetime
+
+report = {
+    'timestamp': datetime.now().isoformat(),
+    'status': '${{ job.status }}',
+    'workflow_name': 'DeepSeek API Validation'
+}
+
+with open('reports/performance_report.json', 'w') as f:
+    json.dump(report, f, indent=2)
+        "
+    
     - name: Notify on Failure
       if: failure()
       uses: 8398a7/action-slack@v3
       with:
         status: ${{ job.status }}
-        text: API Validation Tests Failed! 🚨
+        text: API Validation Tests Failed! Performance or Rate Limit Issues Detected 
         webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+    
+    - name: Upload Performance Report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-report
+        path: reports/performance_report.json
+        retention-days: 30

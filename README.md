@@ -238,6 +238,51 @@ We've implemented comprehensive API response validation to ensure:
 - Detailed error reporting
 - Continuous integration monitoring
 
+## Advanced API Performance Validation
+
+### Comprehensive Performance Benchmarking
+Our validation strategy now includes advanced performance testing:
+
+#### Performance Metrics
+- **Response Time Tracking**
+  - Maximum individual response time
+  - Average response time across queries
+  - Concurrent request performance
+
+- **Token Generation Analysis**
+  - Tokens generated per second
+  - Consistency of token generation rate
+
+#### Rate Limiting Validation
+- Simulate high-frequency requests
+- Test API's graceful handling under load
+- Verify rate limit error handling
+
+### Performance Thresholds
+- Maximum response time: 5 seconds
+- Average response time: 2 seconds
+- Concurrent request capacity: 10 simultaneous queries
+- Maximum token generation rate: 100 tokens/second
+
+### Monitoring Capabilities
+- Automated daily performance tests
+- Detailed performance reports
+- Slack notifications for critical issues
+- Performance report artifacts for trend analysis
+
+### Key Testing Scenarios
+1. Individual query performance
+2. Concurrent request handling
+3. Rate limiting behavior
+4. Token generation consistency
+
+### Reporting
+- JSON performance reports
+- Timestamped test results
+- Workflow status tracking
+
+**Note**: Helps maintain API reliability and identify potential bottlenecks early
+
 ## Performance Evaluation
 
 ### DeepSeek Performance Notebook
