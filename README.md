@@ -142,6 +142,42 @@ chmod +x deepseek_curl_example.sh
 jupyter notebook DeepSeek_Exploration.ipynb
 ```
 
+## Performance Evaluation
+
+### DeepSeek Performance Notebook
+The `DeepSeek_Performance_Evaluation.ipynb` provides a comprehensive assessment of the DeepSeek-R1 model's capabilities:
+
+#### Evaluation Metrics
+- **Reasoning Performance**
+  - Tests across different difficulty levels
+  - Measures response time and token count
+  - Includes easy, medium, and hard reasoning tasks
+
+- **Coding Performance**
+  - Evaluates code generation in multiple languages
+  - Assesses response time and code complexity
+  - Languages tested: Python, JavaScript, Rust
+
+#### Visualization
+- Bar charts comparing response times
+- Performance metrics across different task types
+- Insights into model's strengths and limitations
+
+### How to Run
+```bash
+jupyter notebook DeepSeek_Performance_Evaluation.ipynb
+```
+
+### Customization
+- Easily extend test cases
+- Add more programming languages
+- Modify difficulty levels
+
+### Key Insights
+- Quantitative analysis of AI model performance
+- Benchmark DeepSeek-R1's reasoning and coding abilities
+- Provides a structured approach to model evaluation
+
 ## Key Components
 - Python script for DeepSeek AI interaction
 - Node.js script for DeepSeek AI interaction

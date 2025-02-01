@@ -4,6 +4,11 @@ notebook==6.5.4
 openai==1.10.0
 python-dotenv==1.0.0
 
+# Performance Evaluation Dependencies
+pandas==2.0.1
+numpy==1.24.3
+matplotlib==3.7.1
+
 # Node.js dependencies (for package.json)
 # openai
 # typescript (optional)
