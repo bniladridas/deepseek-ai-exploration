@@ -142,6 +142,49 @@ chmod +x deepseek_curl_example.sh
 jupyter notebook DeepSeek_Exploration.ipynb
 ```
 
+## Jupyter Notebook JSON Structure
+
+### Understanding Notebook Metadata
+
+Jupyter notebooks are stored as JSON files with a specific structure:
+
+```json
+{
+    "cells": [
+        {
+            "cell_type": "markdown|code",
+            "metadata": {},
+            "source": ["Cell content as an array of strings"]
+        }
+    ],
+    "metadata": {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "name": "python",
+            "version": "3.8.5"
+        }
+    },
+    "nbformat": 4,
+    "nbformat_minor": 4
+}
+```
+
+### Key Components
+- **cells**: Array of notebook cells (markdown or code)
+- **metadata**: Information about kernel and language
+- **nbformat**: Notebook format version
+- **nbformat_minor**: Minor version of the notebook format
+
+### Troubleshooting Tips
+- Ensure valid JSON structure
+- Check for proper cell formatting
+- Verify metadata is correctly defined
+- Use tools like `nbconvert` to validate notebooks
+
 ## Performance Evaluation
 
 ### DeepSeek Performance Notebook
@@ -177,6 +220,130 @@ jupyter notebook DeepSeek_Performance_Evaluation.ipynb
 - Quantitative analysis of AI model performance
 - Benchmark DeepSeek-R1's reasoning and coding abilities
 - Provides a structured approach to model evaluation
+
+## Full Performance Evaluation Notebook Content
+
+### Note
+For the most up-to-date and interactive version, please refer to the `DeepSeek_Performance_Evaluation.ipynb` file in the repository.
+
+```python
+# DeepSeek-R1 Performance Evaluation Notebook
+
+# Project Overview
+# This notebook provides a comprehensive performance evaluation 
+# of the DeepSeek-R1 AI model across various domains and test scenarios.
+
+# Import required libraries
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+import time
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load environment variables
+load_dotenv()
+
+# Initialize OpenAI client
+client = OpenAI(
+    base_url="https://integrate.api.nvidia.com/v1",
+    api_key=os.getenv('NVIDIA_API_KEY')
+)
+
+# Test Case 1: Reasoning Performance
+def test_reasoning_performance(prompts):
+    results = []
+    for difficulty, prompt in prompts.items():
+        start_time = time.time()
+        response = client.chat.completions.create(
+            model="deepseek-ai/deepseek-r1",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500
+        )
+        end_time = time.time()
+        
+        results.append({
+            'difficulty': difficulty,
+            'prompt': prompt,
+            'response': response.choices[0].message.content,
+            'response_time': end_time - start_time,
+            'token_count': len(response.choices[0].message.content.split())
+        })
+    
+    return pd.DataFrame(results)
+
+# Reasoning test prompts
+reasoning_prompts = {
+    'easy': "What is 15 * 7?",
+    'medium': "If a train travels 120 miles in 2 hours, what is its speed?",
+    'hard': "Solve this logic puzzle: A farmer has chickens and cows. The total number of heads is 50 and the total number of legs is 140. How many chickens and cows does the farmer have?"
+}
+
+# Run reasoning performance tests
+reasoning_results = test_reasoning_performance(reasoning_prompts)
+print(reasoning_results)
+
+# Test Case 2: Coding Performance
+def test_coding_performance(coding_tasks):
+    results = []
+    for language, task in coding_tasks.items():
+        start_time = time.time()
+        response = client.chat.completions.create(
+            model="deepseek-ai/deepseek-r1",
+            messages=[{"role": "user", "content": task}],
+            max_tokens=500
+        )
+        end_time = time.time()
+        
+        results.append({
+            'language': language,
+            'task': task,
+            'solution': response.choices[0].message.content,
+            'response_time': end_time - start_time,
+            'code_length': len(response.choices[0].message.content.split('\n'))
+        })
+    
+    return pd.DataFrame(results)
+
+# Coding tasks for different languages
+coding_tasks = {
+    'Python': "Write a function to calculate the Fibonacci sequence up to n terms",
+    'JavaScript': "Create a function that checks if a string is a palindrome",
+    'Rust': "Implement a basic bubble sort algorithm"
+}
+
+# Run coding performance tests
+coding_results = test_coding_performance(coding_tasks)
+print(coding_results)
+
+# Visualization of Performance Metrics
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+reasoning_results.plot(x='difficulty', y='response_time', kind='bar')
+plt.title('Reasoning Task Response Time')
+plt.xlabel('Difficulty Level')
+plt.ylabel('Response Time (seconds)')
+
+plt.subplot(1, 2, 2)
+coding_results.plot(x='language', y='response_time', kind='bar')
+plt.title('Coding Task Response Time')
+plt.xlabel('Programming Language')
+plt.ylabel('Response Time (seconds)')
+
+plt.tight_layout()
+plt.show()
+
+# Performance Summary
+# This notebook provides a comprehensive evaluation of the 
+# DeepSeek-R1 model's performance across reasoning and coding tasks.
+```
+
+### Notebook Execution Notes
+- Requires NVIDIA API Key
+- Depends on environment variables
+- Uses OpenAI client for model interaction
+- Generates performance metrics and visualizations
 
 ## Key Components
 - Python script for DeepSeek AI interaction
