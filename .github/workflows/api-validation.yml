@@ -1,14 +1,14 @@
-name: DeepSeek API Validation
+name: DeepSeek AI Model Validation
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run daily at midnight
+    - cron: '0 6 * * 1'  # Run weekly on Monday at 6 AM
   workflow_dispatch:  # Allow manual trigger
   pull_request:
     branches: [ main ]
 
 jobs:
-  api-validation:
+  model-benchmarking:
     runs-on: ubuntu-latest
     
     steps:
@@ -17,16 +17,17 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: '3.8'
+        python-version: '3.9'
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest openai python-dotenv
+        pip install openai python-dotenv pytest
     
     - name: Run API Response Tests
       env:
         NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
         cd tests
         python -m pytest api_response_validator.py
@@ -34,11 +35,20 @@ jobs:
     - name: Run Performance and Rate Limiting Tests
       env:
         NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
         cd tests
         python -m pytest performance_rate_validator.py
     
-    - name: Generate Performance Report
+    - name: Run Multi-Model Benchmarking
+      env:
+        NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      run: |
+        cd tests
+        python model_benchmarking.py
+    
+    - name: Generate Comprehensive Report
       if: always()
       run: |
         mkdir -p reports
@@ -49,10 +59,10 @@ from datetime import datetime
 report = {
     'timestamp': datetime.now().isoformat(),
     'status': '${{ job.status }}',
-    'workflow_name': 'DeepSeek API Validation'
+    'workflow_name': 'DeepSeek AI Model Validation'
 }
 
-with open('reports/performance_report.json', 'w') as f:
+with open('reports/comprehensive_report.json', 'w') as f:
     json.dump(report, f, indent=2)
         "
     
@@ -61,13 +71,15 @@ with open('reports/performance_report.json', 'w') as f:
       uses: 8398a7/action-slack@v3
       with:
         status: ${{ job.status }}
-        text: API Validation Tests Failed! Performance or Rate Limit Issues Detected 
+        text: Model Validation Tests Failed! Critical Performance Issues Detected 
         webhook_url: ${{ secrets.SLACK_WEBHOOK }}
     
-    - name: Upload Performance Report
+    - name: Upload Benchmark Reports
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: performance-report
-        path: reports/performance_report.json
+        name: model-benchmark-reports
+        path: |
+          benchmark_report.json
+          reports/comprehensive_report.json
         retention-days: 30
