@@ -35,7 +35,7 @@ jobs:
         python advanced_benchmarking.py
     
     - name: Upload Performance Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: model-performance-reports
         path: |
@@ -51,7 +51,7 @@ jobs:
         status: ${{ job.status }}
         text: >
           AI Model Performance Benchmark Completed! 
-          📊 Reports Generated: 
+          Reports Generated: 
           - Comprehensive JSON Report
           - SQLite Performance Database
           - Interactive Visualizations
