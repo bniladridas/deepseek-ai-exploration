@@ -49,10 +49,11 @@ jobs:
       if: always()
       with:
         status: ${{ job.status }}
-        text: >
+        text: |
           AI Model Performance Benchmark Completed! 
           Reports Generated: 
           - Comprehensive JSON Report
           - SQLite Performance Database
           - Interactive Visualizations
         webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
