@@ -1,3 +1,6 @@
+# Future Improvements Needed
+# Areas for improvement: enhanced validation rules, automated repairs
+
 name: Jupyter Notebook Validator
 
 on:
